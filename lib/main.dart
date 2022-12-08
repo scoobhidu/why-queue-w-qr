@@ -87,7 +87,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
                   textScaleFactor:
                   MediaQuery.of(context).textScaleFactor.clamp(1, 1.2)),
               child: child!),
-          // will set theme in next commit
+          // TODO: will set theme in next commit
           // theme: ThemeData(
           //     colorScheme: Theme.of(context).colorScheme.copyWith(
           //         primary: LightTheme.deepOrange400,
