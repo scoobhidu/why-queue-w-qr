@@ -1,0 +1,20 @@
+-- Table: public.student
+
+-- DROP TABLE IF EXISTS public.student;
+
+CREATE TABLE IF NOT EXISTS public.student
+(
+    enroll_no bigint NOT NULL,
+    first_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    last_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    dob date NOT NULL,
+    batch character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    "group" character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    session_id character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT student_pkey1 PRIMARY KEY (session_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.student
+    OWNER to postgres;
