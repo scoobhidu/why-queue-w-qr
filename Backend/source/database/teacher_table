@@ -1,0 +1,20 @@
+-- Table: public.teacher
+
+-- DROP TABLE IF EXISTS public.teacher;
+
+CREATE TABLE IF NOT EXISTS public.teacher
+(
+    first_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    last_name character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    phone_no bigint NOT NULL,
+    email_id character varying(100) COLLATE pg_catalog."default" NOT NULL,
+    secret_code character varying(50) COLLATE pg_catalog."default" NOT NULL,
+    classes character varying(50)[] COLLATE pg_catalog."default" NOT NULL,
+    branch character varying(20) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT student_pkey PRIMARY KEY (email_id)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.teacher
+    OWNER to postgres;
