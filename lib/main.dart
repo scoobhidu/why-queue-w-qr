@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 
 import 'package:camera/camera.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -6,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:themed/themed.dart';
 import 'package:why_queue_w_qr/routes/app_routes.dart';
 import 'core/utils/color_constant.dart';
@@ -15,8 +17,6 @@ late List<CameraDescription> cameras;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
-  print(dotenv.env['x_api_keyCash']);
   cameras = await availableCameras();
 
   final deviceInfoPlugin = DeviceInfoPlugin();
@@ -38,6 +38,8 @@ Future<void> main() async {
 class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
+  var netInfo;
+  Rx<bool> connected = true.obs;
 }
 
 class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
@@ -46,6 +48,17 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
+    widget.netInfo = InternetConnectionChecker().onStatusChange.listen((status) {
+      switch(status) {
+        case InternetConnectionStatus.connected:
+          log("Connected to net");
+          widget.connected.value = true;
+          break;
+        default:
+          log("Not connected anymore");
+          widget.connected.value = false;
+      }
+    });
     super.initState();
   }
 
@@ -70,7 +83,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return Obx(() => AbsorbPointer(
-      // absorbing: netInfo.disableScreen.value,
+      absorbing: widget.connected.value,
       // absorbing will depend on an active internet connection
       child: Themed(
         child: GetMaterialApp(
