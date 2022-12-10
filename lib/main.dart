@@ -48,7 +48,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   void initState() {
     WidgetsBinding.instance?.addObserver(this);
-    widget.netInfo = InternetConnectionChecker().onStatusChange.listen((status) {
+    widget.netInfo = InternetConnectionChecker.createInstance(
+      checkInterval: const Duration(seconds: 20)
+    ).onStatusChange.listen((status) {
       switch(status) {
         case InternetConnectionStatus.connected:
           log("Connected to net");
