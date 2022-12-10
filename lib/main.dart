@@ -91,7 +91,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
           // theme: ThemeData(
           //     colorScheme: Theme.of(context).colorScheme.copyWith(
           //         primary: LightTheme.deepOrange400,
-          //         secondary: LightTheme.bluegray900)),
+          //         secondary: LightTheme.bluegray900))
         ),
       ),
     ));
