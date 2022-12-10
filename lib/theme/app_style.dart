@@ -398,6 +398,15 @@ class AppStyle {
     fontWeight: FontWeight.w400,
   );
 
+  static TextStyle txtSoraRegularExtra12Gray700 = TextStyle(
+    color: LightTheme.gray700,
+    fontSize: getFontSize(
+      12,
+    ),
+    fontFamily: 'Sora',
+    fontWeight: FontWeight.w500,
+  );
+
   static TextStyle txtSoraRegular11Gray201 = TextStyle(
     color: LightTheme.gray201,
     fontSize: getFontSize(

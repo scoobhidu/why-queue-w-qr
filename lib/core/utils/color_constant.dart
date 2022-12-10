@@ -53,6 +53,7 @@ class LightTheme {
   static const greenA700 = const ColorRef(Color(0xff10b349));
   static const bluegray201 = const ColorRef(Color(0xffB0ADBE));
   static const lightGreen50 = const ColorRef(Color(0xffEFFFF5));
+  static const cherryRed = const ColorRef(Color(0xffFC6B68));
 }
 
 Map<ThemeRef, Object> DarkTheme = {
