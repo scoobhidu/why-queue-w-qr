@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"why-queue-w-qr/login/handlers"
+	"why-queue-w-qr/utils"
 )
 
 func init() {
@@ -42,19 +43,12 @@ func main() {
 	app := fiber.New()
 	v1 := app.Group("/v1")
 
-	const login string = "/login/:enrol_no/:session_id"
-	const loginAll string = "/login/all"
-	const markAttendance string = "/attendance/mark/:teacher_id/:jwt_token/:timestamp"
-	const getStudentAttendance string = "/attendance/student/:enrolment_no/:session_id"
-	const getClassAttendance string = "/attendance/class/:class"
-	const addExcusedAttendance string = "/attendance/excused/:class/:enrolment_no"
-
-	v1.Post(login, handlers.LoginFunc)
-	v1.Post(markAttendance, handlers.MarkAttendance)
-	v1.Post(addExcusedAttendance, handlers.AddExcusedAttendance)
-	v1.Get(loginAll, handlers.GetAll)
-	v1.Get(getStudentAttendance, handlers.GetStudentAttendance)
-	v1.Get(getClassAttendance, handlers.GetClassAttendance)
+	v1.Post(utils.Login, handlers.LoginFunc)
+	v1.Post(utils.MarkAttendance, handlers.MarkAttendance)
+	v1.Get(utils.AddExcusedAttendance, handlers.AddExcusedAttendance) // TODO change to POST
+	v1.Get(utils.GetAll, handlers.GetAll)
+	v1.Get(utils.GetStudentAttendance, handlers.GetStudentAttendance)
+	v1.Get(utils.GetClassAttendance, handlers.GetClassAttendance)
 
 	log.Fatal(app.Listen("127.0.0.1:9010"))
 }
