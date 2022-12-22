@@ -14,7 +14,7 @@ router.get("/genqr",async (req,res)=>{
     // assuming i get class name in data
     const tokenId = req.headers['authorization'];
     const teachId = jwt.verify(tokenId,process.env.TEACHER_TOKEN);
-    const QRgen=await QR.generator(teachId.userName);
+    const QRgen=await QR.generator(teachId.password);
     // console.log('QR',QRgen);
     res.status(202).json({message:QRgen});
 })
@@ -22,7 +22,7 @@ router.get("/genqr",async (req,res)=>{
 router.get("/clearqr",async(req,res)=>{
     const tokenId = req.headers['authorization'];
     const teachId = jwt.verify(tokenId,process.env.TEACHER_TOKEN);
-    clear(teachId);
+    clear(teachId.password);
 })
 
 router.post('/getclass',(req,res)=>{ 
