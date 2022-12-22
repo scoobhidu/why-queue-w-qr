@@ -1,11 +1,10 @@
-package handlers
+package loginHandlers
 
 import (
 	"database/sql"
 	_ "database/sql"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
-	"reflect"
 	"strconv"
 	"why-queue-w-qr/login/models"
 )
@@ -74,42 +73,5 @@ func LoginFunc(c *fiber.Ctx) error {
 
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{
 		"message": "Success",
-	})
-}
-
-func AddExcusedAttendance(c *fiber.Ctx) error {
-	fmt.Println(reflect.TypeOf(c.Params("class")))
-	fmt.Println(reflect.TypeOf(c.Params("loginID")))
-	fmt.Println(reflect.TypeOf(c.Params("enrolment_no")))
-
-	return c.JSON(fiber.Map{
-		"message": "Working",
-	})
-}
-
-func MarkAttendance(c *fiber.Ctx) error {
-	fmt.Println(reflect.TypeOf(c.Params("class")))
-	fmt.Println(reflect.TypeOf(c.Params("loginID")))
-	fmt.Println(reflect.TypeOf(c.Params("enrolment_no")))
-	return c.JSON(fiber.Map{
-		"message": "Working",
-	})
-}
-
-func GetStudentAttendance(c *fiber.Ctx) error {
-	fmt.Println(reflect.TypeOf(c.Params("class")))
-	fmt.Println(reflect.TypeOf(c.Params("loginID")))
-	fmt.Println(reflect.TypeOf(c.Params("enrolment_no")))
-	return c.JSON(fiber.Map{
-		"message": "Working",
-	})
-}
-
-func GetClassAttendance(c *fiber.Ctx) error {
-	fmt.Println(reflect.TypeOf(c.Params("class")))
-	fmt.Println(reflect.TypeOf(c.Params("loginID")))
-	fmt.Println(reflect.TypeOf(c.Params("enrolment_no")))
-	return c.JSON(fiber.Map{
-		"message": "Working",
 	})
 }

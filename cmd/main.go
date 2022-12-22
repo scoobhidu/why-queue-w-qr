@@ -1,14 +1,19 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
-	"why-queue-w-qr/login/handlers"
+	"time"
+	"why-queue-w-qr/attendance/attendanceHandlers"
+	"why-queue-w-qr/login/loginHandlers"
 	"why-queue-w-qr/utils"
 )
 
@@ -28,7 +33,7 @@ func main() {
 		os.Getenv("dbname"))
 	var err error
 
-	handlers.StudentsDB, err = sql.Open("postgres", postgreConn)
+	loginHandlers.StudentsDB, err = sql.Open("postgres", postgreConn)
 	if err != nil {
 		log.Fatalf("Error Connecting to the students DB: %s", err.Error())
 	}
@@ -38,17 +43,24 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error closing your Database! %s", err)
 		}
-	}(handlers.StudentsDB)
+	}(loginHandlers.StudentsDB)
+
+	attendanceHandlers.MongoCTX, _ = context.WithTimeout(context.Background(), 10*time.Second)
+	client, err := mongo.Connect(attendanceHandlers.MongoCTX, options.Client().ApplyURI(os.Getenv("ATLAS_URI")))
+	if err != nil {
+		panic(err)
+	}
+	defer client.Disconnect(attendanceHandlers.MongoCTX)
 
 	app := fiber.New()
 	v1 := app.Group("/v1")
 
-	v1.Post(utils.Login, handlers.LoginFunc)
-	v1.Post(utils.MarkAttendance, handlers.MarkAttendance)
-	v1.Get(utils.AddExcusedAttendance, handlers.AddExcusedAttendance) // TODO change to POST
-	v1.Get(utils.GetAll, handlers.GetAll)
-	v1.Get(utils.GetStudentAttendance, handlers.GetStudentAttendance)
-	v1.Get(utils.GetClassAttendance, handlers.GetClassAttendance)
+	v1.Post(utils.Login, loginHandlers.LoginFunc)
+	v1.Post(utils.MarkAttendance, attendanceHandlers.MarkAttendance)
+	v1.Post(utils.AddExcusedAttendance, attendanceHandlers.AddExcusedAttendance) // TODO change to POST
+	v1.Get(utils.GetAll, loginHandlers.GetAll)
+	v1.Get(utils.GetStudentAttendance, attendanceHandlers.GetStudentAttendance)
+	v1.Get(utils.GetClassAttendance, attendanceHandlers.GetClassAttendance)
 
 	log.Fatal(app.Listen("127.0.0.1:9010"))
 }

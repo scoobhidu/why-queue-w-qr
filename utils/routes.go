@@ -2,7 +2,7 @@ package utils
 
 const Login string = "/login/:enrol_no/:session_id"
 const GetAll string = "/login/all"
-const MarkAttendance string = "/attendance/mark/:teacher_id/:jwt_token/:timestamp"
-const GetStudentAttendance string = "/attendance/student/:enrolment_no/:session_id"
-const GetClassAttendance string = "/attendance/class/:class"
-const AddExcusedAttendance string = "/attendance/excused/:loginID/:class/:enrolment_no"
+const MarkAttendance string = "/attendance/mark"
+const GetStudentAttendance string = "/attendance/student/:class/:teacher_id/:enrolment_no"
+const GetClassAttendance string = "/attendance/class/:class/:teacher_id"
+const AddExcusedAttendance string = "/attendance/excused/:class/:teacher_id/:enrolment_no"
