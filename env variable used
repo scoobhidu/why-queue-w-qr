@@ -1,0 +1,3 @@
+TEACHER_TOKEN='TeAcHeRtOkEnIdFoRjWt'
+ATTENDANCE_TOKEN='AtTeNdAnCetOkEnIdFoRjWt'
+MONGODB_URL='mongodb+srv://ag:ag27@cluster0.4maaaw7.mongodb.net/hackdb?retryWrites=true&w=majority'
