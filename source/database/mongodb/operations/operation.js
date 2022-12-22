@@ -26,6 +26,18 @@ module.exports = {
                     let obj={};
                     obj[jwt]=date;
                     doc.JWT.push(obj);
+                    UserModel.findOneAndUpdate({'TeacherID':TeacherID},{JWT:doc.JWT}).exec()
+                        .then((doc)=>{
+                            if(!doc){
+                                console.log("Not Found");
+                            }
+                            else{
+                                console.log(doc);
+                            }
+            })
+            .catch((err)=>{
+                console.log(err);
+            })
                 }
             })
             .catch((err)=>{
