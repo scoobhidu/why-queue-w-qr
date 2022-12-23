@@ -30,10 +30,21 @@ func main() {
 		os.Getenv("password"),
 		os.Getenv("dbname"))
 	var err error
-
 	loginHandlers.StudentsDB, err = sql.Open("postgres", postgreConn)
 	if err != nil {
 		log.Fatalf("Error Connecting to the students DB: %s", err.Error())
+	}
+
+	postgreConn = fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("host"),
+		os.Getenv("port"),
+		os.Getenv("user"),
+		os.Getenv("password"),
+		os.Getenv("attendanceDBname"))
+
+	attendanceHandlers.AttendanceDB, err = sql.Open("postgres", postgreConn)
+	if err != nil {
+		log.Fatalf("Error Connecting to the attendance DB: %s", err.Error())
 	}
 
 	defer func(StudentsDB *sql.DB) {
