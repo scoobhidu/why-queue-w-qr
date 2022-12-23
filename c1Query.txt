@@ -17,4 +17,4 @@ INSERT INTO public.c1(
 	(845702719,'Aman Kumar','{}','{}','{}','{}'),
 	(73802721,'Garvit Aggarwal','{}','{}','{}','{}');
 -----
-update c1 set meenu_mait = array_cat(meenu_mait, '{"2022-12-24"}') where enroll_no = 11802721;
+update c1 set priyank_saxena = array_cat(priyank_saxena, '{"2022-12-24"}') where enroll_no = 54802721;
