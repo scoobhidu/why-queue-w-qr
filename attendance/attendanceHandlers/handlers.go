@@ -8,10 +8,10 @@ import (
 	"github.com/valyala/fasthttp"
 	"log"
 	"reflect"
+	"sync"
 	"why-queue-w-qr/attendance/models/AttendanceReqBodyModel"
+	"why-queue-w-qr/utils"
 )
-
-var BatchMaster *batch.Batch[func()]
 
 func AddExcusedAttendance(c *fiber.Ctx) error {
 	fmt.Println(reflect.TypeOf(c.Params("class")))
@@ -23,6 +23,10 @@ func AddExcusedAttendance(c *fiber.Ctx) error {
 	})
 }
 
+var lati float64 = 77.06595815940048
+var longi = 28.71931254354033
+
+var BatchMaster *batch.Batch[func()]
 var AttendanceDB *sql.DB
 
 func MarkAttendance(c *fiber.Ctx) error {
@@ -37,41 +41,26 @@ func MarkAttendance(c *fiber.Ctx) error {
 
 	// TODO check with mongoDB for JWT and timestamp
 	// TODO + location
-	//hackDB := MongoClient.Database(os.Getenv("mongoDBname"))
-	//JWTs := hackDB.Collection("qraccesses")
-	//
-	//ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	//defer cancel()
-	//cur, err := JWTs.Find(ctx, bson.D{payload.TeacherId})
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer cur.Close(ctx)
-	//for cur.Next(ctx) {
-	//	var result MongoJWTmodels.JwtCollection
-	//	err := cur.Decode(&result)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
-	//	fmt.Println(result.TeacherID)
-	//}
-	//if err := cur.Err(); err != nil {
-	//	log.Fatal(err)
-	//}
-	//var JWTs []MongoJWTmodels.JwtCollection
-	//err = jwtCollection.FindOne(c.Context(), bson.M{}).Decode(&JWTs)
+	wg := new(sync.WaitGroup)
 
-	//BatchMaster.Input <- func() {
-	fmt.Println("Starting Execution")
-	query := fmt.Sprintf("update %s set %s = array_cat(%s, '{\"%s\"}') where enroll_no=%d;", payload.Class, payload.TeacherId, payload.TeacherId, payload.Timestamp, payload.EnrolmentNo)
-	fmt.Println(query)
-	_, err = AttendanceDB.Query(query)
-	switch {
-	case err != nil:
-		log.Fatalf("Err: %s", err)
+	wg.Add(1)
+	go utils.CheckJWT(payload.JwtToken, payload.Timestamp, wg)
+	wg.Add(1)
+	go utils.GetDistanceFromLatLonInKm()
+
+	wg.Wait()
+
+	BatchMaster.Input <- func() {
+		fmt.Println("Starting Execution")
+		query := fmt.Sprintf("update %s set %s = array_cat(%s, '{\"%s\"}') where enroll_no=%d;", payload.Class, payload.TeacherId, payload.TeacherId, payload.Timestamp, payload.EnrolmentNo)
+		fmt.Println(query)
+		_, err = AttendanceDB.Query(query)
+		switch {
+		case err != nil:
+			log.Fatalf("Err: %s", err)
+		}
+		fmt.Println("executed statement")
 	}
-	fmt.Println("executed statement")
-	//}
 
 	fmt.Printf("Payload: %s, %d, %s, %s, %s", payload.Class, payload.EnrolmentNo, payload.TeacherId, payload.JwtToken, payload.Timestamp)
 

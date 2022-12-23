@@ -62,7 +62,9 @@ func main() {
 	go func() {
 		for {
 			output := <-attendanceHandlers.BatchMaster.Output
-			fmt.Println(output)
+			for _, f := range output {
+				f()
+			}
 		}
 	}()
 
