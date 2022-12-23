@@ -3,16 +3,17 @@ package utils
 import (
 	"sync"
 	_ "time"
-	"why-queue-w-qr/attendance/attendanceHandlers"
-	"why-queue-w-qr/attendance/models/MongoJWTmodels"
+	"why-queue-w-qr/models"
 )
+
+var JwtCheck = make(chan bool)
 
 func CheckJWT(jwt string, timeStamp int64, wg *sync.WaitGroup) {
 	defer wg.Done()
-	creationTime, ok := MongoJWTmodels.JwtCollection[jwt]
+	creationTime, ok := models.JwtCollection[jwt]
 	if ok && creationTime <= timeStamp && timeStamp <= creationTime+10000 {
-		attendanceHandlers.JwtCheck <- true
+		JwtCheck <- true
 	} else {
-		attendanceHandlers.JwtCheck <- false
+		JwtCheck <- false
 	}
 }

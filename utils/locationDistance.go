@@ -3,8 +3,9 @@ package utils
 import (
 	"math"
 	"sync"
-	"why-queue-w-qr/attendance/attendanceHandlers"
 )
+
+var DistanceCheck = make(chan bool)
 
 func GetDistanceFromLatLonInKm(lat1 float64, lon1 float64, lat2 float64, lon2 float64, wg *sync.WaitGroup) {
 	defer wg.Done()
@@ -19,9 +20,9 @@ func GetDistanceFromLatLonInKm(lat1 float64, lon1 float64, lat2 float64, lon2 fl
 	var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	var distance = R * c // Distance in km
 	if distance < 0.1 {
-		attendanceHandlers.DistanceCheck <- true
+		DistanceCheck <- true
 	} else {
-		attendanceHandlers.DistanceCheck <- false
+		DistanceCheck <- false
 	}
 }
 

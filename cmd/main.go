@@ -10,8 +10,7 @@ import (
 	"log"
 	"os"
 	"time"
-	"why-queue-w-qr/attendance/attendanceHandlers"
-	"why-queue-w-qr/login/loginHandlers"
+	"why-queue-w-qr/handlers"
 	"why-queue-w-qr/utils"
 )
 
@@ -30,7 +29,7 @@ func main() {
 		os.Getenv("password"),
 		os.Getenv("dbname"))
 	var err error
-	loginHandlers.StudentsDB, err = sql.Open("postgres", postgreConn)
+	handlers.StudentsDB, err = sql.Open("postgres", postgreConn)
 	if err != nil {
 		log.Fatalf("Error Connecting to the students DB: %s", err.Error())
 	}
@@ -42,7 +41,7 @@ func main() {
 		os.Getenv("password"),
 		os.Getenv("attendanceDBname"))
 
-	attendanceHandlers.AttendanceDB, err = sql.Open("postgres", postgreConn)
+	handlers.AttendanceDB, err = sql.Open("postgres", postgreConn)
 	if err != nil {
 		log.Fatalf("Error Connecting to the attendance DB: %s", err.Error())
 	}
@@ -52,16 +51,16 @@ func main() {
 		if err != nil {
 			log.Fatalf("Error closing your Database! %s", err)
 		}
-	}(loginHandlers.StudentsDB)
+	}(handlers.StudentsDB)
 
-	attendanceHandlers.BatchMaster = goBatch.New[func()](
+	handlers.BatchMaster = goBatch.New[func()](
 		goBatch.WithMaxWait(60*time.Second),
 		goBatch.WithSize(100000),
 	)
 
 	go func() {
 		for {
-			output := <-attendanceHandlers.BatchMaster.Output
+			output := <-handlers.BatchMaster.Output
 			for _, f := range output {
 				f()
 			}
@@ -71,12 +70,12 @@ func main() {
 	app := fiber.New()
 	v1 := app.Group("/v1")
 
-	v1.Post(utils.Login, loginHandlers.LoginFunc)
-	v1.Post(utils.MarkAttendance, attendanceHandlers.MarkAttendance)
-	v1.Post(utils.AddExcusedAttendance, attendanceHandlers.AddExcusedAttendance) // TODO change to POST
-	v1.Get(utils.GetAll, loginHandlers.GetAll)
-	v1.Get(utils.GetStudentAttendance, attendanceHandlers.GetStudentAttendance)
-	v1.Get(utils.GetClassAttendance, attendanceHandlers.GetClassAttendance)
+	v1.Post(utils.Login, handlers.LoginFunc)
+	v1.Post(utils.MarkAttendance, handlers.MarkAttendance)
+	v1.Post(utils.AddExcusedAttendance, handlers.AddExcusedAttendance) // TODO change to POST
+	v1.Get(utils.GetAll, handlers.GetAll)
+	v1.Get(utils.GetStudentAttendance, handlers.GetStudentAttendance)
+	v1.Get(utils.GetClassAttendance, handlers.GetClassAttendance)
 
 	log.Fatal(app.Listen("127.0.0.1:9010"))
 }

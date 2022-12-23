@@ -1,4 +1,4 @@
-package attendanceHandlers
+package handlers
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"sync"
 	"time"
-	"why-queue-w-qr/attendance/models/AttendanceReqBodyModel"
+	"why-queue-w-qr/models"
 	"why-queue-w-qr/utils"
 )
 
@@ -27,14 +27,11 @@ func AddExcusedAttendance(c *fiber.Ctx) error {
 var lati float64 = 77.06595815940048
 var longi float64 = 28.71931254354033
 
-var JwtCheck = make(chan bool)
-var DistanceCheck = make(chan bool)
-
 var BatchMaster *batch.Batch[func()]
 var AttendanceDB *sql.DB
 
 func MarkAttendance(c *fiber.Ctx) error {
-	payload := new(AttendanceReqBodyModel.AttendanceReqModel)
+	payload := new(models.AttendanceReqModel)
 
 	err := c.BodyParser(payload)
 	if err != nil {
@@ -52,7 +49,7 @@ func MarkAttendance(c *fiber.Ctx) error {
 	go utils.GetDistanceFromLatLonInKm(payload.Lat, payload.Longi, lati, longi, wg)
 	wg.Wait()
 
-	if <-JwtCheck && <-DistanceCheck != true {
+	if <-utils.JwtCheck && <-utils.DistanceCheck != true {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Either you are not on the location or you tried to scan an expired jwt",
 		})

@@ -1,4 +1,4 @@
-package AttendanceReqBodyModel
+package models
 
 type AttendanceReqModel struct {
 	Class       string  `json:"class" form:"class"`

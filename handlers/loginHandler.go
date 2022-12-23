@@ -1,4 +1,4 @@
-package loginHandlers
+package handlers
 
 import (
 	"database/sql"
@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"strconv"
-	"why-queue-w-qr/login/models"
+	"why-queue-w-qr/models"
 )
 
 var StudentsDB *sql.DB
 
 func GetAll(c *fiber.Ctx) error {
 	println("Querying started")
-	rows, err := StudentsDB.Query("select * from student")
+	rows, err := StudentsDB.Query("select * from students")
 	if err != nil {
 		return c.JSON(fiber.Map{
 			"message": fmt.Sprintf("Error %s", err),
@@ -44,7 +44,7 @@ func LoginFunc(c *fiber.Ctx) error {
 	println("Login Querying started")
 
 	var dbSessionId sql.NullString
-	err = StudentsDB.QueryRow(fmt.Sprintf("select session_id from student where enroll_no = %d", enrol_no)).Scan(&dbSessionId)
+	err = StudentsDB.QueryRow(fmt.Sprintf("select session_id from students where enroll_no = %d", enrol_no)).Scan(&dbSessionId)
 	switch {
 	case err == sql.ErrNoRows:
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
@@ -57,7 +57,7 @@ func LoginFunc(c *fiber.Ctx) error {
 		})
 
 	case dbSessionId.Valid == false:
-		_, err := StudentsDB.Exec(fmt.Sprintf("UPDATE student SET session_id = '%s' WHERE enroll_no = %d", sessionId, enrol_no))
+		_, err := StudentsDB.Exec(fmt.Sprintf("UPDATE students SET session_id = '%s' WHERE enroll_no = %d", sessionId, enrol_no))
 		fmt.Println("Updating")
 		if err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

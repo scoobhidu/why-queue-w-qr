@@ -8,7 +8,6 @@ require (
 	github.com/joho/godotenv v1.4.0
 	github.com/lib/pq v1.10.7
 	github.com/valyala/fasthttp v1.41.0
-	go.mongodb.org/mongo-driver v1.11.1
 )
 
 require (
