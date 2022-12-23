@@ -3,9 +3,10 @@ package utils
 import (
 	"math"
 	"sync"
+	"why-queue-w-qr/attendance/attendanceHandlers"
 )
 
-func GetDistanceFromLatLonInKm(lat1 float64, lon1 float64, lat2 float64, lon2 float64, wg *sync.WaitGroup) float64 {
+func GetDistanceFromLatLonInKm(lat1 float64, lon1 float64, lat2 float64, lon2 float64, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	var R float64 = 6371.345 // Radius of the earth in km
@@ -17,7 +18,11 @@ func GetDistanceFromLatLonInKm(lat1 float64, lon1 float64, lat2 float64, lon2 fl
 
 	var c = 2 * math.Atan2(math.Sqrt(a), math.Sqrt(1-a))
 	var distance = R * c // Distance in km
-	return distance
+	if distance < 0.1 {
+		attendanceHandlers.DistanceCheck <- true
+	} else {
+		attendanceHandlers.DistanceCheck <- false
+	}
 }
 
 func deg2rad(deg float64) float64 {
