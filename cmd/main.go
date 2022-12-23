@@ -1,14 +1,12 @@
 package main
 
 import (
-	"context"
 	"database/sql"
 	"fmt"
+	goBatch "github.com/RashadAnsari/go-batch/v2"
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"os"
 	"time"
@@ -45,12 +43,17 @@ func main() {
 		}
 	}(loginHandlers.StudentsDB)
 
-	attendanceHandlers.MongoCTX, _ = context.WithTimeout(context.Background(), 10*time.Second)
-	client, err := mongo.Connect(attendanceHandlers.MongoCTX, options.Client().ApplyURI(os.Getenv("ATLAS_URI")))
-	if err != nil {
-		panic(err)
-	}
-	defer client.Disconnect(attendanceHandlers.MongoCTX)
+	attendanceHandlers.BatchMaster = goBatch.New[func()](
+		goBatch.WithMaxWait(60*time.Second),
+		goBatch.WithSize(100000),
+	)
+
+	go func() {
+		for {
+			output := <-attendanceHandlers.BatchMaster.Output
+			fmt.Println(output)
+		}
+	}()
 
 	app := fiber.New()
 	v1 := app.Group("/v1")

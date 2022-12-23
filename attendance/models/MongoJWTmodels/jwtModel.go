@@ -1,6 +1,8 @@
 package MongoJWTmodels
 
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 type JwtCollection struct {
 	ID        primitive.ObjectID `bson:"_id,omitempty"`
@@ -9,9 +11,6 @@ type JwtCollection struct {
 }
 
 type Jwt struct {
-	ID          primitive.ObjectID `bson:"_id,omitempty"`
-	Podcast     primitive.ObjectID `bson:"podcast,omitempty"`
-	Title       string             `bson:"title,omitempty"`
-	Description string             `bson:"description,omitempty"`
-	Duration    int32              `bson:"duration,omitempty"`
+	Token     string `bson:"omitempty"`
+	Timestamp int    `bson:"omitempty"`
 }
