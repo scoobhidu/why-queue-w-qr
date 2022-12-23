@@ -63,7 +63,9 @@ func MarkAttendance(c *fiber.Ctx) error {
 
 	//BatchMaster.Input <- func() {
 	fmt.Println("Starting Execution")
-	_, err = AttendanceDB.Exec(fmt.Sprintf("update %s set %s = array_cat(%s, '{\"%s\"}') where enroll_no = %d", payload.Class, payload.TeacherId, payload.TeacherId, payload.Timestamp, payload.EnrolmentNo))
+	query := fmt.Sprintf("update %s set %s = array_cat(%s, '{\"%s\"}') where enroll_no=%d;", payload.Class, payload.TeacherId, payload.TeacherId, payload.Timestamp, payload.EnrolmentNo)
+	fmt.Println(query)
+	_, err = AttendanceDB.Query(query)
 	switch {
 	case err != nil:
 		log.Fatalf("Err: %s", err)
