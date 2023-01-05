@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
 	"log"
+	"os"
 	"reflect"
 	"sync"
 	"time"
@@ -28,7 +29,31 @@ var lati float64 = 77.06595815940048
 var longi float64 = 28.71931254354033
 
 var BatchMaster *batch.Batch[func()]
-var AttendanceDB *sql.DB
+var attendanceDB *sql.DB
+
+func ConnectAttendanceDB() {
+	postgreConn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
+		os.Getenv("host"),
+		os.Getenv("port"),
+		os.Getenv("user"),
+		os.Getenv("password"),
+		os.Getenv("attendanceDBname"))
+
+	log.Println(postgreConn)
+	var err error
+
+	attendanceDB, err = sql.Open("postgres", postgreConn)
+	if err != nil {
+		log.Fatalf("Error Connecting to the attendance DB: %s", err.Error())
+	}
+}
+
+func CloseAttendanceDB() {
+	err := attendanceDB.Close()
+	if err != nil {
+		log.Fatalf("Error closing your Database! %s", err)
+	}
+}
 
 func MarkAttendance(c *fiber.Ctx) error {
 	payload := new(models.AttendanceReqModel)
@@ -60,7 +85,7 @@ func MarkAttendance(c *fiber.Ctx) error {
 		fmt.Println("Starting Execution")
 		query := fmt.Sprintf("update %s set %s = array_cat(%s, '{\"%s\"}') where enroll_no=%d;", payload.Class, payload.TeacherId, payload.TeacherId, payload.Timestamp, payload.EnrolmentNo)
 		fmt.Println(query)
-		_, err = AttendanceDB.Query(query)
+		_, err = attendanceDB.Query(query)
 		switch {
 		case err != nil:
 			log.Fatalf("Err: %s", err)
@@ -76,9 +101,22 @@ func MarkAttendance(c *fiber.Ctx) error {
 }
 
 func GetStudentAttendance(c *fiber.Ctx) error {
-	fmt.Println(reflect.TypeOf(c.Params("class")))
-	fmt.Println(reflect.TypeOf(c.Params("loginID")))
-	fmt.Println(reflect.TypeOf(c.Params("enrolment_no")))
+	studentClass := c.Params("class")
+	teacher_id := c.Params("teacher_id")
+	session_id := c.Params("session_id")
+	enrolment_no := c.Params("enrolment_no")
+
+	// session id == nil => directly go for querying
+	// if both IDs are nil, status is not authenticated
+
+	if session_id == "" && teacher_id == "" {
+		// not authorized
+	} else if session_id == "" {
+		// direct query
+	} else {
+		// query with session_id check
+	}
+
 	return c.JSON(fiber.Map{
 		"message": "Working",
 	})
