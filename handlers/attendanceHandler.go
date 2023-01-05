@@ -7,6 +7,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/valyala/fasthttp"
 	"log"
+	"net/http"
 	"os"
 	"reflect"
 	"sync"
@@ -101,24 +102,41 @@ func MarkAttendance(c *fiber.Ctx) error {
 }
 
 func GetStudentAttendance(c *fiber.Ctx) error {
-	studentClass := c.Params("class")
-	teacher_id := c.Params("teacher_id")
-	session_id := c.Params("session_id")
-	enrolment_no := c.Params("enrolment_no")
+	studentClass := c.Query("class")
+	teacher_id := c.Query("teacher_id")
+	session_id := c.Query("session_id")
+	enrolment_no := c.Query("enrolment_no")
 
-	// session id == nil => directly go for querying
-	// if both IDs are nil, status is not authenticated
+	var query string
 
 	if session_id == "" && teacher_id == "" {
-		// not authorized
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{
+			"message": "No sessionID or teacherID provided",
+		})
 	} else if session_id == "" {
-		// direct query
+		query = fmt.Sprintf("select %s from %s where enroll_no = %s;", teacher_id, studentClass, enrolment_no)
+		fmt.Println(query)
 	} else {
-		// query with session_id check
+		query = fmt.Sprintf("select %s from %s where enroll_no = %s and session_id = %s;", teacher_id, studentClass, enrolment_no, session_id)
+		fmt.Println(query)
 	}
 
-	return c.JSON(fiber.Map{
-		"message": "Working",
+	var attendance []uint8
+	err := attendanceDB.QueryRow(query).Scan(&attendance)
+
+	if err == sql.ErrNoRows {
+		return c.Status(http.StatusBadRequest).JSON(fiber.Map{
+			"message": "No matching records",
+		})
+	} else if err != nil {
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{
+			"message": err.Error(),
+		})
+	}
+
+	return c.Status(http.StatusOK).JSON(fiber.Map{
+		"attendance": attendance,
+		"message":    "Working",
 	})
 }
 
